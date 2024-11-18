@@ -77,7 +77,7 @@ Trackbar controls for:
 - Erosion and dilation kernel sizes and iterations
 
 ## Hosting
-The hosted version of the app is available at [Grain-Boundary-Detection](https://grain-boundary.streamlit.app/)
+The hosted version of the app is available at [Grain-Boundary-Detection](https://grain-boundary-detection.streamlit.app/)
 
 
 
