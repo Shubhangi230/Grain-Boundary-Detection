@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from skimage.segmentation import felzenszwalb
 from skimage.color import label2rgb
+import cv2.ximgproc
 
 
 def morpho_operations_with_GB(image_path,erosion_iter = 1, dilation_iter=1):
@@ -79,6 +80,29 @@ def graph_cut_withoutGB(image_path, erosion_iter=1, dilation_iter=1):
     result = cv2.addWeighted(segmented_bgr, 0.7, edges_colored, 0.3, 0)
     
     return result
+
+def ximgproc_graph_cut(image_path,erosion_iter=1,dilation_iter=1):
+    """Graph cut segmentation using cv2.ximgproc"""
+    img = cv2.imread(image_path, 0)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7,7))
+    eroded = cv2.erode(img, kernel, iterations=erosion_iter)
+    dilated = cv2.dilate(eroded, kernel, iterations=dilation_iter)
+    img = cv2.GaussianBlur(dilated, (5,5), 0)
+    
+    gseg = cv2.ximgproc.segmentation.createGraphSegmentation()
+    imgs = gseg.processImage(dilated).astype(int)
+    
+    r,c = imgs.shape
+    mask = np.ndarray(shape=(r,c,3), dtype=np.uint8)
+    color_dict = {}
+    
+    for i in range(r):
+        for j in range(c):
+            if imgs[i,j] not in color_dict:
+                color_dict[imgs[i,j]] = (255*np.random.rand(1,3)).astype(np.uint8)
+            mask[i,j] = color_dict[imgs[i,j]]
+            
+    return mask
 
 if __name__ == "__main__":
     # Process image
