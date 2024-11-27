@@ -6,7 +6,7 @@ A computer vision application for detecting and analyzing grain boundaries in ge
 
 ```
 .
-├── 0.jpeg
+├── 0.jpeg                           # Sample input image
 ├── utils/
 │   └── graph_cut_segmentation.py    # Core segmentation algorithms
 ├── app.py                           # Streamlit web interface
@@ -16,52 +16,80 @@ A computer vision application for detecting and analyzing grain boundaries in ge
 
 ## Features
 
-- Multiple image processing approaches:
-  - Graph cut segmentation with Gaussian blur
-  - Graph cut segmentation without Gaussian blur
-  - Morphological operations with Gaussian blur
-  - Morphological operations without Gaussian blur
-- Interactive controls for:
-  - Erosion iterations
-  - Dilation iterations
-  - Gaussian blur parameters
-- Two interfaces:
-  - Web interface (Streamlit)
-  - Command-line interface with trackbars
+### Image Processing Methods
+
+1. **Morphological Operations with Gaussian Blur**
+   - Pre-processes image with Gaussian blur for noise reduction
+   - Applies morphological operations (erosion and dilation)
+   - Customizable iterations for both operations
+   - Best for noisy images requiring smoothing
+
+2. **Morphological Operations without Gaussian Blur**
+   - Direct application of morphological operations
+   - Preserves more original image details
+   - Suitable for clean, high-quality images
+   - Maintains sharp edges and fine details
+
+3. **Graph Cut Segmentation with Gaussian Blur**
+   - Combines Gaussian blur with Felzenszwalb segmentation
+   - Enhanced edge detection and overlay
+   - Scale, sigma, and minimum size parameters
+   - Optimal for complex grain boundaries
+
+4. **Graph Cut Segmentation without Gaussian Blur**
+   - Pure graph-cut based segmentation
+   - Maintains original image sharpness
+   - Uses Felzenszwalb algorithm
+   - Best for high-contrast images
+
+5. **XImgProc Graph Cut**
+   - Implements OpenCV's ximgproc segmentation
+   - Advanced graph-based segmentation
+   - Colored region visualization
+   - High-precision boundary detection
 
 ## Installation
 
-1. Clone the repository
-2. Install the required dependencies:
+1. Clone the repository:
+```bash
+git clone [repository-url]
+cd grain-boundary-detection
+```
+
+2. Create and activate a virtual environment (recommended):
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install the required dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-## Dependencies
-
-- OpenCV (cv2) >= 4.8.0
-- NumPy >= 1.24.0
-- scikit-image >= 0.21.0
-- Streamlit >= 1.26.0
-
 ## Usage
 
-### Web Interface
+### Web Interface (Recommended)
 
-Run the Streamlit app:
+The Streamlit-based web interface offers an intuitive way to process images:
+
+1. Start the web application:
 ```bash
 streamlit run app.py
 ```
 
-Features:
-- Upload images through the web interface
-- Adjust erosion and dilation iterations
-- View multiple processing results side by side
-- Download processed images
+2. Features:
+   - Upload images through drag-and-drop or file selection
+   - Adjust erosion and dilation iterations with sliders
+   - Real-time preview of processing results
+   - Side-by-side comparison of different methods
+   - Download processed images in PNG format
+   - Interactive parameter adjustment
 
 ### Command-line Interface
 
-Run the command-line version:
+For batch processing or automation, use the command-line interface:
+
 ```bash
 python main.py
 ```
@@ -74,40 +102,45 @@ Controls:
 
 Trackbar controls for:
 - Gaussian blur kernel size and sigma
-- Erosion and dilation kernel sizes and iterations
+- Erosion and dilation kernel sizes
+- Number of iterations for morphological operations
 
-## Hosting
-The hosted version of the app is available at [Grain-Boundary-Detection](https://grain-boundary-detection.streamlit.app/)
+## Dependencies
 
-
-
-## Image Processing Methods
-
-### 1. Morphological Operations with Gaussian Blur
-- Applies Gaussian blur for noise reduction
-- Uses morphological operations (erosion and dilation) with customizable iterations
-- Suitable for initial noise reduction and feature enhancement
-
-### 2. Morphological Operations without Gaussian Blur
-- Direct application of morphological operations
-- Preserves more original image details
-- Useful when blur-based smoothing is not desired
-
-### 3. Graph Cut Segmentation with Gaussian Blur
-- Combines Gaussian blur with Felzenszwalb segmentation
-- Enhanced edge detection and overlay
-- Best for clear grain boundary detection
-
-### 4. Graph Cut Segmentation without Gaussian Blur
-- Pure graph-cut based segmentation
-- Maintains original image sharpness
-- Suitable for high-quality input images
+Core requirements:
+- OpenCV (cv2) >= 4.8.0
+- NumPy >= 1.24.0
+- scikit-image >= 0.21.0
+- Streamlit >= 1.26.0
 
 ## Output
 
-The processed images can be:
-- Viewed in real-time
-- Saved automatically with timestamps
-- Downloaded through the web interface
-- Saved with processing parameters in a separate text file
+The processed images are:
+- Displayed in real-time during processing
+- Automatically saved with timestamps
+- Available for download through the web interface
+- Accompanied by processing parameters in text files
+
+## Online Demo
+
+Try the hosted version at: [Grain-Boundary-Detection](https://grain-boundary.streamlit.app/)
+
+## Technical Details
+
+### Image Processing Parameters
+
+- **Gaussian Blur**:
+  - Kernel size: 5x5 (default)
+  - Sigma: Adjustable via interface
+  
+- **Morphological Operations**:
+  - Kernel shape: Elliptical
+  - Kernel size: 7x7 (default)
+  - Iterations: User-configurable (1-10)
+
+- **Graph Cut Segmentation**:
+  - Scale: 100
+  - Sigma: 0.5
+  - Minimum size: 50 pixels
+
 

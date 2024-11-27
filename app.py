@@ -1,7 +1,13 @@
 import streamlit as st
 import cv2
 import numpy as np
-from utils.graph_cut_segmentation import graph_cut_segment, graph_cut_withoutGB, morpho_operations_with_GB, morpho_operations_without_GB
+from utils.graph_cut_segmentation import (
+    graph_cut_segment, 
+    graph_cut_withoutGB, 
+    morpho_operations_with_GB, 
+    morpho_operations_without_GB,
+    ximgproc_graph_cut
+)
 
 import tempfile
 import os
@@ -40,43 +46,51 @@ if uploaded_file is not None:
         result0 = morpho_operations_with_GB(temp_path, erosion_iter=erosion_iterations, dilation_iter=dilation_iterations)
         progress_bar.progress(20)
         result1 = morpho_operations_without_GB(temp_path, erosion_iter=erosion_iterations, dilation_iter=dilation_iterations)
-        # Process image with custom iterations
         progress_bar.progress(30)
         result = graph_cut_segment(temp_path, erosion_iter=erosion_iterations, dilation_iter=dilation_iterations)
         progress_bar.progress(60)
         result2 = graph_cut_withoutGB(temp_path, erosion_iter=erosion_iterations, dilation_iter=dilation_iterations)
+        progress_bar.progress(80)
+        ximgproc_result = ximgproc_graph_cut(temp_path,erosion_iter=erosion_iterations, dilation_iter=dilation_iterations)
         progress_bar.progress(100)
     
-    # Display images one after the other
-    col1, col2, col3 = st.columns([1,3,1])
-    with col2:
-        st.subheader("Original Image")
-        st.image(uploaded_file, width=900, use_column_width=True)
-    st.write("Original input image before processing")
+    # Display images in a grid layout
+    st.markdown("""
+        <h2 style='text-align: center; color: #0066cc; margin-bottom: 30px;'>🔍 Image Processing Results</h2>
+    """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns([1,3,1])
-    with col2:
-        st.subheader("Morphological Operations with Gaussian Blur")
-        st.image(result0, width=900, use_column_width=True)
-    st.write("Image with only Morphological Operations applied with Gaussian Blur")
+    # Original image in full width
+    st.subheader("📸 Original Image")
+    st.image(uploaded_file, use_column_width=True)
     
-    col1, col2, col3 = st.columns([1,3,1])
+    # First row of processed images
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("### 🔄 Morphological + Gaussian Blur")
+        st.image(result0, use_column_width=True)
+        st.caption("Morphological operations with Gaussian blur applied")
+        
     with col2:
-        st.subheader("Morphological Operations without Gaussian Blur")
-        st.image(result1, width=900, use_column_width=True)
-    st.write("Image with only Morphological Operations applied without Gaussian Blur")
+        st.markdown("### 🔄 Pure Morphological")
+        st.image(result1, use_column_width=True)
+        st.caption("Morphological operations without Gaussian blur")
     
-    col1, col2, col3 = st.columns([1,3,1])
+    # Second row of processed images
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("### ✨ Segmented + Gaussian")
+        st.image(result, use_column_width=True)
+        st.caption("Graph cut segmentation using felzenswab with Gaussian blur")
+        
     with col2:
-        st.subheader("Segmented Image with Gaussian Blur")
-        st.image(result, width=900, use_column_width=True)
-    st.write("Processed image with grain boundaries detected")
+        st.markdown("### ✨ Pure Segmentation")
+        st.image(result2, use_column_width=True)
+        st.caption("Graph cut segmentation using felzenswab without Gaussian blur")
     
-    col1, col2, col3 = st.columns([1,3,1])
-    with col2:
-        st.subheader("Segmented Image without Gaussian Blur")
-        st.image(result2, width=900, use_column_width=True)
-    st.write("Processed image with grain boundaries detected but without Gaussian Blur")
+    # XImgProc result in full width
+    st.markdown("### 🎯 XImgProc Graph Cut")
+    st.image(ximgproc_result, use_column_width=True)
+    st.caption("Graph-cut segmentation using cv2.ximgproc")
     
     # with col1:
     #     st.subheader("Original Image")
@@ -99,23 +113,47 @@ if uploaded_file is not None:
         st.info(f"**Dilation Iterations:** {dilation_iterations}")
     
     # Convert result to bytes for download
-    is_success, buffer = cv2.imencode(".png", result)
-    if is_success:
-        btn = st.download_button(
-            label="Download Segmented Image",
-            data=buffer.tobytes(),
-            file_name="segmented_image_withGB.png",
-            mime="image/png"
-        )
-        
-    is_success, buffer = cv2.imencode(".png", result2)
-    if is_success:
-        btn = st.download_button(
-            label="Download Segmented Image without Gaussian Blur",
-            data=buffer.tobytes(),
-            file_name="segmented_image_withoutGB.png",
-            mime="image/png"
-        )
+    
+    # Download section
+    st.markdown("---")
+    st.markdown("""
+        <h3 style='text-align: center; color: #0066cc;'>📥 Download Results</h3>
+        <p style='text-align: center; color: #666666; margin-bottom: 20px;'>Download processed images in PNG format</p>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1,4,1])
+    with col2:
+        is_success, buffer = cv2.imencode(".png", result)
+        if is_success:
+            st.download_button(
+                label="💫 Download Segmented Image with Gaussian Blur",
+                data=buffer.tobytes(),
+                file_name="segmented_image_withGB.png",
+                mime="image/png",
+                use_container_width=True,
+            )
+            st.markdown("<div style='margin: 10px'></div>", unsafe_allow_html=True)
+            
+        is_success, buffer = cv2.imencode(".png", result2)
+        if is_success:
+            st.download_button(
+                label="✨ Download Segmented Image without Gaussian Blur",
+                data=buffer.tobytes(),
+                file_name="segmented_image_withoutGB.png",
+                mime="image/png",
+                use_container_width=True,
+            )
+            st.markdown("<div style='margin: 10px'></div>", unsafe_allow_html=True)
+            
+        is_success, buffer = cv2.imencode(".png", ximgproc_result)
+        if is_success:
+            st.download_button(
+                label="🎯 Download XImgProc Segmented Image",
+                data=buffer.tobytes(),
+                file_name="ximgproc_segmented.png",
+                mime="image/png",
+                use_container_width=True,
+            )
     
     # Cleanup temp file
     os.unlink(temp_path)
