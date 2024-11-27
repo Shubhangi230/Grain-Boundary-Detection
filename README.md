@@ -123,7 +123,7 @@ The processed images are:
 
 ## Online Demo
 
-Try the hosted version at: [Grain-Boundary-Detection](https://grain-boundary.streamlit.app/)
+Try the hosted version at: [Grain-Boundary-Detection](https://grain-boundary-detection.streamlit.app/)
 
 ## Technical Details
 
