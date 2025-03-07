@@ -61,35 +61,35 @@ if uploaded_file is not None:
     
     # Original image in full width
     st.subheader("📸 Original Image")
-    st.image(uploaded_file, use_column_width=True)
+    st.image(uploaded_file, use_container_width=True)
     
     # First row of processed images
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("### 🔄 Morphological + Gaussian Blur")
-        st.image(result0, use_column_width=True)
+        st.image(result0, use_container_width=True)
         st.caption("Morphological operations with Gaussian blur applied")
         
     with col2:
         st.markdown("### 🔄 Pure Morphological")
-        st.image(result1, use_column_width=True)
+        st.image(result1, use_container_width=True)
         st.caption("Morphological operations without Gaussian blur")
     
     # Second row of processed images
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("### ✨ Segmented + Gaussian")
-        st.image(result, use_column_width=True)
+        st.image(result, use_container_width=True)
         st.caption("Graph cut segmentation using felzenswab with Gaussian blur")
         
     with col2:
         st.markdown("### ✨ Pure Segmentation")
-        st.image(result2, use_column_width=True)
+        st.image(result2, use_container_width=True)
         st.caption("Graph cut segmentation using felzenswab without Gaussian blur")
     
     # XImgProc result in full width
     st.markdown("### 🎯 XImgProc Graph Cut")
-    st.image(ximgproc_result, use_column_width=True)
+    st.image(ximgproc_result, use_container_width=True)
     st.caption("Graph-cut segmentation using cv2.ximgproc")
     
     # with col1:
